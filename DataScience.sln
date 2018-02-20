@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27004.2010
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataScience", "DataScience\DataScience.csproj", "{DE09BA99-193C-4DEE-9115-988B26C4BF94}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DE09BA99-193C-4DEE-9115-988B26C4BF94}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE09BA99-193C-4DEE-9115-988B26C4BF94}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE09BA99-193C-4DEE-9115-988B26C4BF94}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE09BA99-193C-4DEE-9115-988B26C4BF94}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E701B480-1504-4931-9186-6DB1336E2C83}
+	EndGlobalSection
+EndGlobal

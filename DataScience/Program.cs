@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace DataScience
 {
@@ -15,13 +16,18 @@ namespace DataScience
             ISimiliartyCalculator euclidean = new Euclidean();
             ISimiliartyCalculator pearson = new Pearson();
             ISimiliartyCalculator cosine = new Cosine();
-            int testUser1 = 1;
-            int testUser2 = 6;
-            Console.WriteLine(euclidean.Calculate(dataSet[testUser1], dataSet[testUser2]) + " euclidean");
-            Console.WriteLine(pearson.Calculate(dataSet[testUser1], dataSet[testUser2]) + " pearson");
-            Console.WriteLine(cosine.Calculate(dataSet[testUser1], dataSet[testUser2]) + " cosine");
+            //Dictionary<int, double> testUser1 = dataSet[1];
+            //Dictionary<int, double> testUser2 = dataSet[2];
+            //Console.WriteLine(euclidean.Calculate(testUser1, testUser2) + " euclidean");
+            //Console.WriteLine(pearson.Calculate(testUser1, testUser2) + " pearson");
+            //Console.WriteLine(cosine.Calculate(testUser1, testUser2) + " cosine");
+            int testId = 7;
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+            List<User> neighboursTo7 =  NearestNeighbours(dataSet, new KeyValuePair<int, Dictionary<int, double>>(testId, dataSet[testId]), pearson);
 
-            //KeyValuePair<int, Dictionary<int, double>> target = new KeyValuePair<int, Dictionary<int, double>>(7, dataSet[7]);
+            watch.Stop();
+            var elapsedMs = watch.ElapsedMilliseconds;
+            Console.WriteLine(elapsedMs);
             Console.ReadLine();
 
         }
@@ -57,20 +63,47 @@ namespace DataScience
             }
         }
 
-        //static Dictionary<int, Dictionary<int, double>> KNearestNeighbours(
-        //    Dictionary<int, Dictionary<int, double>> users,
-        //    KeyValuePair<int, Dictionary<int, double>> target, 
-        //    Func<Dictionary<int, double>, Dictionary<int, double>, double> similarityFunction)
-        //{
-        //    int maxListLength = 3;
-        //    double similarityThreshold = 0.35;
-        //    foreach(KeyValuePair<int, Dictionary<int, double>> user in users)
-        //    {
-        //        if (user.Key != target.Key)
-        //        {
-        //            // find the similarity
-        //        }
-        //    }
-        //}
+        static List<User> NearestNeighbours(
+            Dictionary<int, Dictionary<int, double>> users,
+            KeyValuePair<int, Dictionary<int, double>> target,
+            ISimiliartyCalculator similarityCalculator)
+        {
+
+            List<User> neighbours = new List<User>();
+            int maxListLength = 3;
+            double similarityThreshold = 0.35;
+
+            foreach (KeyValuePair<int, Dictionary<int, double>> user in users)
+            {
+
+                if (user.Key != target.Key && user.Value.Count > target.Value.Count)
+                {
+                    double similarity = similarityCalculator.Calculate(user.Value, target.Value);
+                    if (similarity > similarityThreshold)
+                    {
+                        if (neighbours.Count < maxListLength)
+                        {
+                            neighbours.Add(new User(user, similarity));
+                        }
+                        else
+                        {
+                            double minSimilarity = neighbours.Min(entry => entry.similarity);
+                            if(similarity > minSimilarity)
+                            {
+                                User furthestNeighbour = neighbours.Find(entry => entry.similarity == minSimilarity);
+                                neighbours.Remove(furthestNeighbour);
+                                neighbours.Add(new User(user, similarity));
+                            }
+                        }
+                    }
+
+                    if (neighbours.Count == maxListLength)
+                    {
+                        similarityThreshold = neighbours.Min(entry => entry.similarity);
+                    }
+                }
+            }
+            return neighbours;
+        }
     }
 }

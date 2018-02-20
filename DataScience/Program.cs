@@ -11,18 +11,18 @@ namespace DataScience
         {
 
             Dictionary<int, UserPreferance> dataSet = ParseDataSet(@"D:\OneDrive\INF\data-science\DataScience\userItem.data");
-            PrintDataSet(dataSet);
+            //PrintDataSet(dataSet);
             ISimiliartyCalculator euclidean = new Euclidean();
             ISimiliartyCalculator pearson = new Pearson();
             ISimiliartyCalculator cosine = new Cosine();
-            Dictionary<int, double> testUser1 = dataSet[1].UserRatings;
-            Dictionary<int, double> testUser2 = dataSet[6].UserRatings;
-            Console.WriteLine(euclidean.Calculate(testUser1, testUser2) + " euclidean");
-            Console.WriteLine(pearson.Calculate(testUser1, testUser2) + " pearson");
-            Console.WriteLine(cosine.Calculate(testUser1, testUser2) + " cosine");
+            //Dictionary<int, double> testUser1 = dataSet[1].UserRatings;
+            //Dictionary<int, double> testUser2 = dataSet[6].UserRatings;
+            //Console.WriteLine(euclidean.Calculate(testUser1, testUser2) + " euclidean");
+            //Console.WriteLine(pearson.Calculate(testUser1, testUser2) + " pearson");
+            //Console.WriteLine(cosine.Calculate(testUser1, testUser2) + " cosine");
             int testId = 7;
             //var watch = System.Diagnostics.Stopwatch.StartNew();
-            //List<User> neighboursTo7 =  NearestNeighbours(dataSet, new KeyValuePair<int, Dictionary<int, double>>(testId, dataSet[testId]), pearson);
+            List<KeyValuePair<int, UserPreferance>> neighboursTo7 = NearestNeighbours(dataSet, new KeyValuePair<int, UserPreferance>(testId, dataSet[testId]), pearson);
 
             //watch.Stop();
             //var elapsedMs = watch.ElapsedMilliseconds;
@@ -64,47 +64,48 @@ namespace DataScience
             }
         }
 
-        //static List<User> NearestNeighbours(
-        //    Dictionary<int, Dictionary<int, double>> users,
-        //    KeyValuePair<int, Dictionary<int, double>> target,
-        //    ISimiliartyCalculator similarityCalculator)
-        //{
+        static List<KeyValuePair<int, UserPreferance>> NearestNeighbours(
+            Dictionary<int, UserPreferance> users,
+            KeyValuePair<int, UserPreferance> target,
+            ISimiliartyCalculator similarityCalculator)
+        {
 
-        //    List<User> neighbours = new List<User>();
-        //    int maxListLength = 3;
-        //    double similarityThreshold = 0.35;
+            List<KeyValuePair<int, UserPreferance>> neighbours = new List<KeyValuePair<int, UserPreferance>>();
+            int maxListLength = 3;
+            double similarityThreshold = 0.35;
 
-        //    foreach (KeyValuePair<int, Dictionary<int, double>> user in users)
-        //    {
+            foreach (KeyValuePair<int, UserPreferance> user in users)
+            {
+                if (user.Key != target.Key)
+                {
+                    double similarity = similarityCalculator.Calculate(user.Value.UserRatings, target.Value.UserRatings);
+                    if (similarity > similarityThreshold && user.Value.UserRatings.Count > target.Value.UserRatings.Count)
+                    {
+                        if (neighbours.Count < maxListLength)
+                        {
+                            user.Value.similarity = similarity;
+                            neighbours.Add(user);
+                        }
+                        else
+                        {
+                            double minSimilarity = neighbours.Min(entry => entry.Value.similarity);
+                            if (similarity > minSimilarity)
+                            {
+                                KeyValuePair<int, UserPreferance> furthestNeighbour = neighbours.Find(entry => entry.Value.similarity == minSimilarity);
+                                neighbours.Remove(furthestNeighbour);
+                                user.Value.similarity = similarity;
+                                neighbours.Add(user);
+                            }
+                        }
+                    }
 
-        //        if (user.Key != target.Key && user.Value.Count > target.Value.Count)
-        //        {
-        //            double similarity = similarityCalculator.Calculate(user.Value, target.Value);
-        //            if (similarity > similarityThreshold)
-        //            {
-        //                if (neighbours.Count < maxListLength)
-        //                {
-        //                    neighbours.Add(new User(user, similarity));
-        //                }
-        //                else
-        //                {
-        //                    double minSimilarity = neighbours.Min(entry => entry.similarity);
-        //                    if(similarity > minSimilarity)
-        //                    {
-        //                        User furthestNeighbour = neighbours.Find(entry => entry.similarity == minSimilarity);
-        //                        neighbours.Remove(furthestNeighbour);
-        //                        neighbours.Add(new User(user, similarity));
-        //                    }
-        //                }
-        //            }
-
-        //            if (neighbours.Count == maxListLength)
-        //            {
-        //                similarityThreshold = neighbours.Min(entry => entry.similarity);
-        //            }
-        //        }
-        //    }
-        //    return neighbours;
-        //}
+                    if (neighbours.Count == maxListLength)
+                    {
+                        similarityThreshold = neighbours.Min(entry => entry.Value.similarity);
+                    }
+                }
+            }
+            return neighbours;
+        }
     }
 }

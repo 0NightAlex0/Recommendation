@@ -11,19 +11,31 @@ namespace DataScience
         {
 
             Dictionary<int, UserPreferance> dataSet = ParseDataSet(@"D:\OneDrive\INF\data-science\DataScience\userItem.data");
-            //PrintDataSet(dataSet);
+            PrintDataSet(dataSet);
             ISimiliartyCalculator euclidean = new Euclidean();
             ISimiliartyCalculator pearson = new Pearson();
             ISimiliartyCalculator cosine = new Cosine();
+
+            // similarity
             //Dictionary<int, double> testUser1 = dataSet[1].UserRatings;
             //Dictionary<int, double> testUser2 = dataSet[6].UserRatings;
             //Console.WriteLine(euclidean.Calculate(testUser1, testUser2) + " euclidean");
             //Console.WriteLine(pearson.Calculate(testUser1, testUser2) + " pearson");
             //Console.WriteLine(cosine.Calculate(testUser1, testUser2) + " cosine");
-            int testId = 7;
-            //var watch = System.Diagnostics.Stopwatch.StartNew();
-            List<KeyValuePair<int, UserPreferance>> neighboursTo7 = NearestNeighbours(dataSet, new KeyValuePair<int, UserPreferance>(testId, dataSet[testId]), pearson);
 
+            // neighbour and ratings
+            int testId = 7;
+            dataSet[testId].UserRatings.Add(106, 5);
+            KeyValuePair<int, UserPreferance> testPair = new KeyValuePair<int, UserPreferance>(testId, dataSet[testId]);
+            List<KeyValuePair<int, UserPreferance>> neighboursTo7 = NearestNeighbours(dataSet, testPair, pearson);
+            Dictionary<int, double> ratingPredictionOf7 = new RatingPredictionCalculator().Calculate(neighboursTo7, new List<int>(new int[] { 101, 103 }));
+
+            //int testId = 4;
+            //KeyValuePair<int, UserPreferance> testPair = new KeyValuePair<int, UserPreferance>(testId, dataSet[testId]);
+            //List<KeyValuePair<int, UserPreferance>> neighboursTo4 = NearestNeighbours(dataSet, testPair, pearson);
+            //Dictionary<int, double> ratingPredictionOf4 = new RatingPredictionCalculator().Calculate(neighboursTo4, new List<int>(new int[] { 101}));
+
+            //var watch = System.Diagnostics.Stopwatch.StartNew();
             //watch.Stop();
             //var elapsedMs = watch.ElapsedMilliseconds;
             //Console.WriteLine(elapsedMs);
@@ -79,7 +91,21 @@ namespace DataScience
                 if (user.Key != target.Key)
                 {
                     double similarity = similarityCalculator.Calculate(user.Value.UserRatings, target.Value.UserRatings);
-                    if (similarity > similarityThreshold && user.Value.UserRatings.Count > target.Value.UserRatings.Count)
+                    Console.WriteLine(user.Key + " " + similarity);
+                    bool hasExtra = false;
+                    foreach (KeyValuePair<int, double> rating in user.Value.UserRatings)
+                    {
+                        if(hasExtra)
+                        {
+                            break;
+                        }
+                        if (!target.Value.UserRatings.ContainsKey(rating.Key))
+                        {
+                            hasExtra = true;
+                        }
+                        
+                    }
+                    if (similarity > similarityThreshold && hasExtra)
                     {
                         if (neighbours.Count < maxListLength)
                         {

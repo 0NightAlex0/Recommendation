@@ -9,3 +9,14 @@ D:\OneDrive\INF\data-science\DataScience\DataScience\obj\Debug\netcoreapp2.0\Dat
 D:\OneDrive\INF\data-science\DataScience\DataScience\obj\Debug\netcoreapp2.0\DataScience.AssemblyInfo.cs
 D:\OneDrive\INF\data-science\DataScience\DataScience\obj\Debug\netcoreapp2.0\DataScience.dll
 D:\OneDrive\INF\data-science\DataScience\DataScience\obj\Debug\netcoreapp2.0\DataScience.pdb
+D:\github\DataScience\DataScience\bin\Debug\netcoreapp2.0\DataScience.deps.json
+D:\github\DataScience\DataScience\bin\Debug\netcoreapp2.0\DataScience.runtimeconfig.json
+D:\github\DataScience\DataScience\bin\Debug\netcoreapp2.0\DataScience.runtimeconfig.dev.json
+D:\github\DataScience\DataScience\bin\Debug\netcoreapp2.0\DataScience.dll
+D:\github\DataScience\DataScience\bin\Debug\netcoreapp2.0\DataScience.pdb
+D:\github\DataScience\DataScience\obj\Debug\netcoreapp2.0\DataScience.csprojResolveAssemblyReference.cache
+D:\github\DataScience\DataScience\obj\Debug\netcoreapp2.0\DataScience.csproj.CoreCompileInputs.cache
+D:\github\DataScience\DataScience\obj\Debug\netcoreapp2.0\DataScience.AssemblyInfoInputs.cache
+D:\github\DataScience\DataScience\obj\Debug\netcoreapp2.0\DataScience.AssemblyInfo.cs
+D:\github\DataScience\DataScience\obj\Debug\netcoreapp2.0\DataScience.dll
+D:\github\DataScience\DataScience\obj\Debug\netcoreapp2.0\DataScience.pdb

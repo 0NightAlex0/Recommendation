@@ -673,11 +673,11 @@
       "hideWarningsAndErrors": true
     },
     "restore": {
-      "projectUniqueName": "D:\\OneDrive\\INF\\data-science\\DataScience\\DataScience\\DataScience.csproj",
+      "projectUniqueName": "D:\\github\\DataScience\\DataScience\\DataScience.csproj",
       "projectName": "DataScience",
-      "projectPath": "D:\\OneDrive\\INF\\data-science\\DataScience\\DataScience\\DataScience.csproj",
+      "projectPath": "D:\\github\\DataScience\\DataScience\\DataScience.csproj",
       "packagesPath": "C:\\Users\\Alex\\.nuget\\packages\\",
-      "outputPath": "D:\\OneDrive\\INF\\data-science\\DataScience\\DataScience\\obj\\",
+      "outputPath": "D:\\github\\DataScience\\DataScience\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"

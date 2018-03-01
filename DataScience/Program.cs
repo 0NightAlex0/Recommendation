@@ -8,14 +8,9 @@ namespace DataScience
 
     class Program
     {
+
         static void Main(string[] args)
         {
-            
-            //Dictionary<int, UserPreferance> dataSet = ParseSmallDataSet(@"D:\OneDrive\INF\data-science\userItem.data");
-            //Dictionary<int, UserPreferance> dataSet = ParseDataSet(@"D:\OneDrive\INF\data-science\ratings.csv");
-
-
-            //PrintDataSet(dataSet);
             ISimiliartyCalculator euclidean = new Euclidean();
             ISimiliartyCalculator pearson = new Pearson();
             ISimiliartyCalculator cosine = new Cosine();
@@ -27,38 +22,41 @@ namespace DataScience
             //Console.WriteLine(pearson.Calculate(testUser1, testUser2) + " pearson");
             //Console.WriteLine(cosine.Calculate(testUser1, testUser2) + " cosine");
 
-            // neighbour and ratings
+            //Dictionary<int, UserPreferance> dataSet = ParseDataSet(@"D:\OneDrive\INF\data-science\userItem.data", false);
+            //// neighbour and ratings
             //int testId = 7;
             //dataSet[testId].UserRatings.Add(106, 5);
             //KeyValuePair<int, UserPreferance> testPair = new KeyValuePair<int, UserPreferance>(testId, dataSet[testId]);
-            //List<KeyValuePair<int, UserPreferance>> neighboursTo7 = NearestNeighbours(dataSet, testPair, pearson);
-            //Dictionary<int, double> ratingPredictionOf7 = new RatingPredictionCalculator().Calculate(neighboursTo7, new List<int>(new int[] { 101, 103 ,106}));
+            //List<KeyValuePair<int, UserPreferance>> neighbours = NearestNeighbours(dataSet, testPair, pearson, 3);
+            //Dictionary<int, double> ratingPrediction = new RatingPredictionCalculator().CalculateGivenList(neighbours, new List<int>(new int[] { 101, 103 }));
 
-            //int testId = 4;
-            //KeyValuePair<int, UserPreferance> testPair = new KeyValuePair<int, UserPreferance>(testId, dataSet[testId]);
-            //List<KeyValuePair<int, UserPreferance>> neighboursTo4 = NearestNeighbours(dataSet, testPair, pearson);
-            //Dictionary<int, double> ratingPredictionOf4 = new RatingPredictionCalculator().Calculate(neighboursTo4, new List<int>(new int[] { 101 }));
+            Dictionary<int, UserPreferance> dataSet = ParseDataSet(@"D:\OneDrive\INF\data-science\ratings.csv", true);
+            int testId = 186;
+            KeyValuePair<int, UserPreferance> testPair = new KeyValuePair<int, UserPreferance>(testId, dataSet[testId]);
+            List<KeyValuePair<int, UserPreferance>> neighbours = NearestNeighbours(dataSet, testPair, pearson, 25);
+            Dictionary<int, double> ratingPrediction = new RatingPredictionCalculator().Calculate(neighbours, new List<int>(new int[] { 101, 103 }));
 
-            //Dictionary<int, UserPreferance> dataSet = ParseSmallDataSet(@"D:\OneDrive\INF\data-science\userItem.data");
+            //PrintDataSet(dataSet
             //var watch = System.Diagnostics.Stopwatch.StartNew();
             //watch.Stop();
             //var elapsedMs = watch.ElapsedMilliseconds;
             //Console.WriteLine(elapsedMs);
             Console.ReadLine();
 
+
         }
         
-        static Dictionary<int, UserPreferance> ParseDataSet(string path, bool hasTitle)
+        public static Dictionary<int, UserPreferance> ParseDataSet(string path, bool hasTitle)
         {
-            //if (hasTitle)
-            //{
-            //    string[] lines = File.ReadAllLines(path).se;
-            //}
-            //else
-            //{
-            //    string[] lines = File.ReadAllLines(path);
-            //}
-            string[] lines = File.ReadAllLines(path);
+            string[] lines;
+            if (hasTitle)
+            {
+                lines = File.ReadAllLines(path).Skip(1).ToArray();
+            }
+            else
+            {
+                lines = File.ReadAllLines(path);
+            }
 
             Dictionary<int, UserPreferance> dataSet = new Dictionary<int, UserPreferance>();
             foreach (string line in lines)
@@ -78,7 +76,7 @@ namespace DataScience
             return dataSet;
         }
 
-        static void PrintDataSet(Dictionary<int, UserPreferance> dataSet)
+        public static void PrintDataSet(Dictionary<int, UserPreferance> dataSet)
         {
             foreach (KeyValuePair<int, UserPreferance> user in dataSet)
             {
@@ -90,19 +88,19 @@ namespace DataScience
             }
         }
 
-        static bool DictionaryHasExtra<T, U>(Dictionary<T, U> current, Dictionary<T, U> target)
+        public static bool DictionaryHasExtra<T, U>(Dictionary<T, U> current, Dictionary<T, U> target)
         {
             return current.Keys.Any(key => !target.ContainsKey(key));
         }
 
-        static List<KeyValuePair<int, UserPreferance>> NearestNeighbours(
+        public static List<KeyValuePair<int, UserPreferance>> NearestNeighbours(
             Dictionary<int, UserPreferance> users,
             KeyValuePair<int, UserPreferance> target,
-            ISimiliartyCalculator similarityCalculator)
+            ISimiliartyCalculator similarityCalculator,
+            int maxNeighbours)
         {
 
             List<KeyValuePair<int, UserPreferance>> neighbours = new List<KeyValuePair<int, UserPreferance>>();
-            int maxListLength = 3;
             double similarityThreshold = 0.35;
 
             foreach (KeyValuePair<int, UserPreferance> user in users)
@@ -114,7 +112,7 @@ namespace DataScience
 
                     if (similarity > similarityThreshold && hasExtra)
                     {
-                        if (neighbours.Count < maxListLength)
+                        if (neighbours.Count < maxNeighbours)
                         {
                             user.Value.similarity = similarity;
                             neighbours.Add(user);
@@ -132,7 +130,7 @@ namespace DataScience
                         }
                     }
 
-                    if (neighbours.Count == maxListLength)
+                    if (neighbours.Count == maxNeighbours)
                     {
                         similarityThreshold = neighbours.Min(entry => entry.Value.similarity);
                     }

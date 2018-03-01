@@ -10,15 +10,15 @@ namespace DataScience
         static void Main(string[] args)
         {
 
-            Dictionary<int, UserPreferance> dataSet = ParseDataSet(@"D:\OneDrive\INF\data-science\DataScience\userItem.data");
-            PrintDataSet(dataSet);
+            Dictionary<int, UserPreferance> dataSet = ParseDataSet(@"D:\OneDrive\INF\data-science\userItem.data");
+            //PrintDataSet(dataSet);
             ISimiliartyCalculator euclidean = new Euclidean();
             ISimiliartyCalculator pearson = new Pearson();
             ISimiliartyCalculator cosine = new Cosine();
 
             // similarity
-            //Dictionary<int, double> testUser1 = dataSet[1].UserRatings;
-            //Dictionary<int, double> testUser2 = dataSet[6].UserRatings;
+            //Dictionary<int, double> testUser1 = dataSet[7].UserRatings;
+            //Dictionary<int, double> testUser2 = dataSet[4].UserRatings;
             //Console.WriteLine(euclidean.Calculate(testUser1, testUser2) + " euclidean");
             //Console.WriteLine(pearson.Calculate(testUser1, testUser2) + " pearson");
             //Console.WriteLine(cosine.Calculate(testUser1, testUser2) + " cosine");
@@ -28,18 +28,19 @@ namespace DataScience
             dataSet[testId].UserRatings.Add(106, 5);
             KeyValuePair<int, UserPreferance> testPair = new KeyValuePair<int, UserPreferance>(testId, dataSet[testId]);
             List<KeyValuePair<int, UserPreferance>> neighboursTo7 = NearestNeighbours(dataSet, testPair, pearson);
-            Dictionary<int, double> ratingPredictionOf7 = new RatingPredictionCalculator().Calculate(neighboursTo7, new List<int>(new int[] { 101, 103 }));
+            Dictionary<int, double> ratingPredictionOf7 = new RatingPredictionCalculator().Calculate(neighboursTo7, new List<int>(new int[] { 101, 103 ,106}));
 
             //int testId = 4;
             //KeyValuePair<int, UserPreferance> testPair = new KeyValuePair<int, UserPreferance>(testId, dataSet[testId]);
             //List<KeyValuePair<int, UserPreferance>> neighboursTo4 = NearestNeighbours(dataSet, testPair, pearson);
-            //Dictionary<int, double> ratingPredictionOf4 = new RatingPredictionCalculator().Calculate(neighboursTo4, new List<int>(new int[] { 101}));
+            //Dictionary<int, double> ratingPredictionOf4 = new RatingPredictionCalculator().Calculate(neighboursTo4, new List<int>(new int[] { 101 }));
 
             //var watch = System.Diagnostics.Stopwatch.StartNew();
             //watch.Stop();
             //var elapsedMs = watch.ElapsedMilliseconds;
             //Console.WriteLine(elapsedMs);
             Console.ReadLine();
+            //user.Value.UserRatings.Keys.Any(key => !target.Value.UserRatings.Keys.Contains(key));
 
         }
         
@@ -76,6 +77,10 @@ namespace DataScience
             }
         }
 
+        static bool DictionaryHasExtra<T, U>(Dictionary<T, U> current, Dictionary<T, U> target)
+        {
+            return current.Keys.Any(key => !target.ContainsKey(key));
+        }
         static List<KeyValuePair<int, UserPreferance>> NearestNeighbours(
             Dictionary<int, UserPreferance> users,
             KeyValuePair<int, UserPreferance> target,
@@ -91,20 +96,9 @@ namespace DataScience
                 if (user.Key != target.Key)
                 {
                     double similarity = similarityCalculator.Calculate(user.Value.UserRatings, target.Value.UserRatings);
-                    Console.WriteLine(user.Key + " " + similarity);
-                    bool hasExtra = false;
-                    foreach (KeyValuePair<int, double> rating in user.Value.UserRatings)
-                    {
-                        if(hasExtra)
-                        {
-                            break;
-                        }
-                        if (!target.Value.UserRatings.ContainsKey(rating.Key))
-                        {
-                            hasExtra = true;
-                        }
-                        
-                    }
+                    //Console.WriteLine(user.Key + " " + similarity);
+                    bool hasExtra = DictionaryHasExtra(user.Value.UserRatings, target.Value.UserRatings);
+
                     if (similarity > similarityThreshold && hasExtra)
                     {
                         if (neighbours.Count < maxListLength)

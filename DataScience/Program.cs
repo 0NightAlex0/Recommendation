@@ -25,16 +25,19 @@ namespace DataScience
             //Dictionary<int, UserPreferance> dataSet = ParseDataSet(@"D:\OneDrive\INF\data-science\userItem.data", false);
             //// neighbour and ratings
             //int testId = 7;
-            //dataSet[testId].UserRatings.Add(106, 5);
+            ////dataSet[testId].UserRatings.Add(106, 5);
             //KeyValuePair<int, UserPreferance> testPair = new KeyValuePair<int, UserPreferance>(testId, dataSet[testId]);
             //List<KeyValuePair<int, UserPreferance>> neighbours = NearestNeighbours(dataSet, testPair, pearson, 3);
-            //Dictionary<int, double> ratingPrediction = new RatingPredictionCalculator().CalculateGivenList(neighbours, new List<int>(new int[] { 101, 103 }));
+            //List<KeyValuePair<int, double>> ratingPrediction = new RatingPredictionCalculator().PredictGivenList(neighbours, new List<int>(new int[] { 101, 103, 106 }));
 
             Dictionary<int, UserPreferance> dataSet = ParseDataSet(@"D:\OneDrive\INF\data-science\ratings.csv", true);
             int testId = 186;
             KeyValuePair<int, UserPreferance> testPair = new KeyValuePair<int, UserPreferance>(testId, dataSet[testId]);
             List<KeyValuePair<int, UserPreferance>> neighbours = NearestNeighbours(dataSet, testPair, pearson, 25);
-            Dictionary<int, double> ratingPrediction = new RatingPredictionCalculator().Calculate(neighbours, new List<int>(new int[] { 101, 103 }));
+            //List<KeyValuePair<int, double>> ratingPrediction = new RatingPredictionCalculator().PredictAll(neighbours, testPair).GetRange(0, 8);
+            // even this is wrong, so maybe neighbours are not correct
+            List<KeyValuePair<int, double>> ratingPrediction = new RatingPredictionCalculator().PredictGivenList(neighbours, new List<int>(new int[] { 116,318,511 }));
+
 
             //PrintDataSet(dataSet
             //var watch = System.Diagnostics.Stopwatch.StartNew();
@@ -45,7 +48,7 @@ namespace DataScience
 
 
         }
-        
+        // tab seperated
         public static Dictionary<int, UserPreferance> ParseDataSet(string path, bool hasTitle)
         {
             string[] lines;

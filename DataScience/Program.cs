@@ -22,7 +22,7 @@ namespace DataScience
             //Console.WriteLine(pearson.Calculate(testUser1, testUser2) + " pearson");
             //Console.WriteLine(cosine.Calculate(testUser1, testUser2) + " cosine");
 
-            //Dictionary<int, UserPreferance> dataSet = ParseDataSet(@"D:\OneDrive\INF\data-science\userItem.data", false);
+            //Dictionary<int, UserPreferance> dataSet = ParseDataSet(@"D:\OneDrive\INF\data-science\userItem.data", ",");
             //// neighbour and ratings
             //int testId = 7;
             ////dataSet[testId].UserRatings.Add(106, 5);
@@ -30,13 +30,13 @@ namespace DataScience
             //List<KeyValuePair<int, UserPreferance>> neighbours = NearestNeighbours(dataSet, testPair, pearson, 3);
             //List<KeyValuePair<int, double>> ratingPrediction = new RatingPredictionCalculator().PredictGivenList(neighbours, new List<int>(new int[] { 101, 103, 106 }));
 
-            Dictionary<int, UserPreferance> dataSet = ParseDataSet(@"D:\OneDrive\INF\data-science\ratings.csv", true);
+            Dictionary<int, UserPreferance> dataSet = ParseDataSet(@"D:\OneDrive\INF\data-science\u.data", "\t");
             int testId = 186;
             KeyValuePair<int, UserPreferance> testPair = new KeyValuePair<int, UserPreferance>(testId, dataSet[testId]);
             List<KeyValuePair<int, UserPreferance>> neighbours = NearestNeighbours(dataSet, testPair, pearson, 25);
-            //List<KeyValuePair<int, double>> ratingPrediction = new RatingPredictionCalculator().PredictAll(neighbours, testPair).GetRange(0, 8);
-            // even this is wrong, so maybe neighbours are not correct
-            List<KeyValuePair<int, double>> ratingPrediction = new RatingPredictionCalculator().PredictGivenList(neighbours, new List<int>(new int[] { 116,318,511 }));
+            List<KeyValuePair<int, double>> ratingPrediction = new RatingPredictionCalculator().PredictAll(neighbours, testPair).GetRange(0, 8);
+
+            List<KeyValuePair<int, double>> ratingPredictionList = new RatingPredictionCalculator().PredictGivenList(neighbours, new List<int>(new int[] { 116, 318, 511 }));
 
 
             //PrintDataSet(dataSet
@@ -49,30 +49,21 @@ namespace DataScience
 
         }
         // tab seperated
-        public static Dictionary<int, UserPreferance> ParseDataSet(string path, bool hasTitle)
+        public static Dictionary<int, UserPreferance> ParseDataSet(string path, string seperator)
         {
-            string[] lines;
-            if (hasTitle)
-            {
-                lines = File.ReadAllLines(path).Skip(1).ToArray();
-            }
-            else
-            {
-                lines = File.ReadAllLines(path);
-            }
+            string[] lines = File.ReadAllLines(path);
 
             Dictionary<int, UserPreferance> dataSet = new Dictionary<int, UserPreferance>();
             foreach (string line in lines)
             {
-                string[] lineSplit = line.Split(",");
+                string[] lineSplit = line.Split(seperator);
                 int userId = int.Parse(lineSplit[0]);
                 int articleId = int.Parse(lineSplit[1]);
                 double rating = double.Parse(lineSplit[2]);
-                UserPreferance preference = new UserPreferance();
 
                 if (!dataSet.ContainsKey(userId))
                 {
-                    dataSet.Add(userId, preference);
+                    dataSet.Add(userId, new UserPreferance());
                 }
                 dataSet[userId].UserRatings.Add(articleId, rating);
             }

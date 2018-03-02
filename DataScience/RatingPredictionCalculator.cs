@@ -34,7 +34,7 @@ namespace DataScience
             {
                 foreach (int ratingId in neighbour.Value.UserRatings.Keys)
                 {
-                    if (!missingKeys.Any(x => x == ratingId))
+                    if (!missingKeys.Any(x => x == ratingId) && !target.Value.UserRatings.ContainsKey(ratingId))
                     {
                         missingKeys.Add(ratingId);
                     }
@@ -46,7 +46,7 @@ namespace DataScience
                 int count = 0;
                 foreach (KeyValuePair<int, UserPreferance> neighbour in neighbours)
                 {
-                    if (count >= 3)
+                    if (count == 3)
                     {
                         // add to predictionList
                         double rating = this.CalculateRating(neighbours, key);

@@ -153,7 +153,7 @@ namespace DataScience
             {
                 for(int j = 0; j < articleIds.Count; j++)
                 {
-                    //GetDeviation(users, articleIds[i], articleIds[i++]);
+                    DeviationData deviationData = GetDeviationData(users, articleIds[i], articleIds[i++]);
                     //result.Add(i, new Dictionary<j>)
                 }
                 

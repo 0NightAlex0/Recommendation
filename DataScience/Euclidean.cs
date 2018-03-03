@@ -26,5 +26,4 @@ namespace DataScience
             return 1 / (1 + distance);
         }
     }
-
 }

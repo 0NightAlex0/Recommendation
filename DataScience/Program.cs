@@ -145,21 +145,28 @@ namespace DataScience
             return articleIds.OrderByDescending(x => x).ToList();
         }
 
-        public static Dictionary<int, Dictionary<int, DeviationData>> GetDeviationTable(Dictionary<int, UserPreferance> users)
+        public static Dictionary<int, KeyValuePair<int, DeviationData>> GetDeviationTable(Dictionary<int, UserPreferance> users)
         {
-            Dictionary<int, Dictionary<int, DeviationData>> result = new Dictionary<int, Dictionary<int, DeviationData>>();
+            Dictionary<int, KeyValuePair<int, DeviationData>> result = new Dictionary<int, KeyValuePair<int, DeviationData>>();
             List<int> articleIds = GetAllArticleIds(users);
             for (int i =0; i < articleIds.Count; i++)
             {
                 for(int j = 0; j < articleIds.Count; j++)
                 {
-                    DeviationData deviationData = GetDeviationData(users, articleIds[i], articleIds[i++]);
-                    //result.Add(i, new Dictionary<j>)
+                    DeviationData deviationData;
+                    if (i == j)
+                    {
+                        deviationData = new DeviationData(0, 0);
+                    }
+                    else
+                    {
+                        deviationData = GetDeviationData(users, articleIds[i], articleIds[i++]);
+                    }
+                    result.Add(i, new KeyValuePair<int, DeviationData>(j, deviationData));
                 }
                 
             }
 
-            
             //deviation(i, j) =>
             //         currdev = 0
             //         foreach user u who rated both items i and j

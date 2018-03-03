@@ -34,11 +34,11 @@ namespace DataScience
 
             foreach (KeyValuePair<int, UserPreferance> neighbour in neighbours)
             {
-                foreach (int ratingId in neighbour.Value.UserRatings.Keys)
+                foreach (int articleId in neighbour.Value.UserRatings.Keys)
                 {
-                    if (!missingKeys.Any(x => x == ratingId) && !target.Value.UserRatings.ContainsKey(ratingId))
+                    if (!missingKeys.Any(x => x == articleId) && !target.Value.UserRatings.ContainsKey(articleId))
                     {
-                        missingKeys.Add(ratingId);
+                        missingKeys.Add(articleId);
                     }
                 }
             }

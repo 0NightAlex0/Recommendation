@@ -36,9 +36,6 @@ namespace DataScience
             //List<KeyValuePair<int, UserPreferance>> neighbours = GetNearestNeighbours(dataSet, testPair, pearson, 25);
             //List<KeyValuePair<int, double>> ratingPrediction = new RatingPredictionCalculator().PredictAll(neighbours, testPair).GetRange(0, 8);
 
-            var x = GetDeviationData(dataSet, 102, 104);
-
-            PrintDataSet(dataSet);
             //var watch = System.Diagnostics.Stopwatch.StartNew();
             //watch.Stop();
             //var elapsedMs = watch.ElapsedMilliseconds;
@@ -183,7 +180,6 @@ namespace DataScience
                 {
                     
                     currentDeviation += ratings[itemA] - ratings[itemB];
-                    Console.WriteLine(user.Key + " - "+ (ratings[itemA] - ratings[itemB]));
                     count++;
                 }
             }

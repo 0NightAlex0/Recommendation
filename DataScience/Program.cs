@@ -26,9 +26,9 @@ namespace DataScience
 
             Dictionary<int, UserPreferance> dataSet = ParseDataSet(@"D:\OneDrive\INF\data-science\userItem.data", ",");
             var test = GetDeviationData(dataSet, 106, 104);
-            //DeviationTable table = new DeviationTable();
-            //table.ComputeDeviations(dataSet);
-
+            DeviationTable table = new DeviationTable();
+            table.ComputeDeviations(dataSet);
+            PrintDeviationTable(table);
             // neighbour and ratings
             int testId = 7;
             dataSet[testId].UserRatings.Add(106, 5);
@@ -170,10 +170,17 @@ namespace DataScience
             return new DeviationData(currentDeviation / count, count);
         }
 
-        //public static void PrintDeviationTable(DeviationTable table)
-        //{
-        //    foreach(var x in table)
-        //}
+        public static void PrintDeviationTable(DeviationTable table)
+        {
+            foreach (KeyValuePair<int,Dictionary<int,DeviationData>> itemA in table.table)
+            {
+                Console.WriteLine("row: "+ itemA.Key);
+                foreach (KeyValuePair<int, DeviationData> itemB in itemA.Value)
+                {
+                    Console.WriteLine("column: "+ itemB.Key + "\tvalue: " + itemB.Value.deviationValue + "\tcount: "+ itemB.Value.nrOfPeople);
+                }
+            }
+        }
 
         //public static double ItemItemRatingCalculator(KeyValuePair<int, UserPreferance> user, int targetArticleId, Dictionary<int, Dictionary<int, DeviationData>> deviationtable)
         //{

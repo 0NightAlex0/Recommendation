@@ -14,9 +14,5 @@ namespace DataScience
             this.nrOfPeople = nrOfPeople;
         }
 
-        public void ComputeDeviationCell()
-        {
-            this.deviationValue /= nrOfPeople;
-        }
     }
 }

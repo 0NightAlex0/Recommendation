@@ -29,9 +29,8 @@ namespace DataScience
         public List<KeyValuePair<int, double>> PredictAll(List<KeyValuePair<int, UserPreferance>> neighbours, KeyValuePair<int, UserPreferance> target)
         {
             List<KeyValuePair<int, double>> ratingPredictions = new List<KeyValuePair<int, double>>();
-            // which key does the target not contain
+            // which key does the target not contain that the neighbors have
             List<int> missingKeys = new List<int>();
-
             foreach (KeyValuePair<int, UserPreferance> neighbour in neighbours)
             {
                 foreach (int articleId in neighbour.Value.UserRatings.Keys)

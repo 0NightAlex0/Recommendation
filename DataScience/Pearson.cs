@@ -6,7 +6,7 @@ namespace DataScience
 {
     class Pearson : ISimiliartyCalculator
     {
-        public double Calculate(Dictionary<int, double> user1, Dictionary<int, double> user2)
+        public double Calculate(Dictionary<int, double> ratings1, Dictionary<int, double> ratings2)
         {
             double counter = 0;
             double sumXY = 0;
@@ -15,13 +15,13 @@ namespace DataScience
             double sumXX = 0;
             double sumYY = 0;
 
-            foreach (KeyValuePair<int, double> user1Article in user1)
+            foreach (KeyValuePair<int, double> pair1 in ratings1)
             {
-                if (user2.ContainsKey(user1Article.Key))
+                if (ratings2.ContainsKey(pair1.Key))
                 {
                     counter++;
-                    double x = user1Article.Value;
-                    double y = user2[user1Article.Key];
+                    double x = pair1.Value;
+                    double y = ratings2[pair1.Key];
                     sumXY += x * y;
                     sumX += x;
                     sumY += y;

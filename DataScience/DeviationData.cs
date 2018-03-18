@@ -13,5 +13,10 @@ namespace DataScience
             this.deviationValue = deviationValue;
             this.nrOfPeople = nrOfPeople;
         }
+
+        public void ComputeDeviationCell()
+        {
+            this.deviationValue /= nrOfPeople;
+        }
     }
 }

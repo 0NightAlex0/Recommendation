@@ -6,14 +6,14 @@ namespace DataScience
 {
     class Euclidean : ISimiliartyCalculator
     {
-        public double Calculate(Dictionary<int, double> user1, Dictionary<int, double> user2)
+        public double Calculate(Dictionary<int, double> ratings1, Dictionary<int, double> ratings2)
         {
             double sumRating = 0;
-            foreach (KeyValuePair<int, double> user1Article in user1)
+            foreach (KeyValuePair<int, double> pair1 in ratings1)
             {
-                if (user2.ContainsKey(user1Article.Key))
+                if (ratings2.ContainsKey(pair1.Key))
                 {
-                    sumRating += Math.Pow(user1Article.Value - user2[user1Article.Key], 2);
+                    sumRating += Math.Pow(pair1.Value - ratings2[pair1.Key], 2);
                 }
             }
             double distance = Math.Sqrt(sumRating);

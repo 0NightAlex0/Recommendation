@@ -3,8 +3,15 @@ using System.Linq;
 using System;
 namespace DataScience
 {
-    class RatingPredictionCalculator
+    class UserItem
     {
+        private List<KeyValuePair<int, UserPreferance>> neighbours = new List<KeyValuePair<int, UserPreferance>>();
+        private Dictionary<int, UserPreferance> users;
+        public UserItem(Dictionary<int, UserPreferance> dataset)
+        {
+            this.users = dataset;
+        }
+
         private double CalculateRating(List<KeyValuePair<int, UserPreferance>> neighbours, int articleId)
         {
             double weightedRating = 0;
@@ -23,10 +30,50 @@ namespace DataScience
             return weightedRating / sumSimilarties;
         }
         // if >3 neighbours rated, then calculate rating
+        public void GetNearestNeighbours(
+           KeyValuePair<int, UserPreferance> target,
+           ISimiliartyCalculator similarityCalculator,
+           int maxNeighbours)
+        {
+            double similarityThreshold = 0.35;
 
+            foreach (KeyValuePair<int, UserPreferance> user in users)
+            {
+                if (user.Key != target.Key)
+                {
+                    double similarity = similarityCalculator.Calculate(user.Value.UserRatings, target.Value.UserRatings);
+                    bool hasExtra = Program.DictionaryHasExtra(user.Value.UserRatings, target.Value.UserRatings);
 
+                    if (similarity > similarityThreshold && hasExtra)
+                    {
+                        if (neighbours.Count < maxNeighbours)
+                        {
+                            user.Value.similarity = similarity;
+                            neighbours.Add(user);
+                        }
+                        else
+                        {
+                            double minSimilarity = neighbours.Min(entry => entry.Value.similarity);
+                            if (similarity > minSimilarity)
+                            {
+                                KeyValuePair<int, UserPreferance> furthestNeighbour = neighbours.Find(entry => entry.Value.similarity == minSimilarity);
+                                neighbours.Remove(furthestNeighbour);
+                                user.Value.similarity = similarity;
+                                neighbours.Add(user);
+                            }
+                        }
+                    }
 
-        public List<KeyValuePair<int, double>> PredictAll(List<KeyValuePair<int, UserPreferance>> neighbours, KeyValuePair<int, UserPreferance> target)
+                    if (neighbours.Count == maxNeighbours)
+                    {
+                        similarityThreshold = neighbours.Min(entry => entry.Value.similarity);
+                    }
+                }
+            }
+            neighbours.OrderByDescending(x => x.Value.similarity).ToList();
+        }
+
+        public List<KeyValuePair<int, double>> PredictAll(KeyValuePair<int, UserPreferance> target)
         {
             List<KeyValuePair<int, double>> ratingPredictions = new List<KeyValuePair<int, double>>();
             // which key does the target not contain that the neighbors have
@@ -65,7 +112,7 @@ namespace DataScience
             return ratingPredictions.OrderByDescending(pair => pair.Value).ToList();
         }
 
-        public List<KeyValuePair<int, double>> PredictGivenList(List<KeyValuePair<int, UserPreferance>> neighbours, List<int> articleIds)
+        public List<KeyValuePair<int, double>> PredictGivenList(List<int> articleIds)
         {
             List<KeyValuePair<int, double>> ratingPredictions = new List<KeyValuePair<int, double>>();
             foreach (int articleId in articleIds)

@@ -24,30 +24,30 @@ namespace DataScience
             //Console.WriteLine(pearson.Calculate(testUser1, testUser2) + " pearson");
             //Console.WriteLine(cosine.Calculate(testUser1, testUser2) + " cosine");
 
-            Dictionary<int, UserPreferance> dataSet = ParseDataSet(@"D:\OneDrive\INF\data-science\userItem.data", ",");
-            var test = GetDeviationData(dataSet, 106, 104);
-            DeviationTable table = new DeviationTable();
-            table.ComputeDeviations(dataSet);
-            PrintDeviationTable(table);
-            // neighbour and ratings
-            int testId = 7;
-            dataSet[testId].UserRatings.Add(106, 5);
-            KeyValuePair<int, UserPreferance> testPair = new KeyValuePair<int, UserPreferance>(testId, dataSet[testId]);
-            List<KeyValuePair<int, UserPreferance>> neighbours = GetNearestNeighbours(dataSet, testPair, pearson, 3);
-            List<KeyValuePair<int, double>> ratingPrediction = new RatingPredictionCalculator().PredictGivenList(neighbours, new List<int>(new int[] { 101, 103, 106 }));
+            Dictionary<int, UserPreferance> dataSet = ParseDataSet(@"D:\github\DataScience\userItem.data", ",");
 
-            //Dictionary<int, UserPreferance> dataSet = ParseDataSet(@"D:\OneDrive\INF\data-science\u.data", "\t");
+            //// neighbour and ratings
+            //int testId = 7;
+            //dataSet[testId].UserRatings.Add(106, 5);
+            //KeyValuePair<int, UserPreferance> testPair = new KeyValuePair<int, UserPreferance>(testId, dataSet[testId]);
+            //UserItem userItem = new UserItem(dataSet);
+            //userItem.GetNearestNeighbours(testPair, pearson, 3);
+            //List<KeyValuePair<int, double>> ratingPrediction = userItem.PredictGivenList(new List<int>(new int[] { 101, 103, 106 }));
+
+            //Dictionary<int, UserPreferance> dataSet = ParseDataSet(@"D:\github\DataScience\u.data", "\t");
             //int testId = 186;
             //KeyValuePair<int, UserPreferance> testPair = new KeyValuePair<int, UserPreferance>(testId, dataSet[testId]);
-            //List<KeyValuePair<int, UserPreferance>> neighbours = GetNearestNeighbours(dataSet, testPair, pearson, 25);
-            //List<KeyValuePair<int, double>> ratingPrediction = new RatingPredictionCalculator().PredictAll(neighbours, testPair).GetRange(0, 8);
+            //UserItem userItem = new UserItem(dataSet);
+            //userItem.GetNearestNeighbours(testPair, pearson, 25);
+            //List<KeyValuePair<int, double>> ratingPrediction = userItem.PredictAll(testPair).GetRange(0, 8);
 
-            //var watch = System.Diagnostics.Stopwatch.StartNew();
-            //watch.Stop();
-            //var elapsedMs = watch.ElapsedMilliseconds;
-            //Console.WriteLine(elapsedMs);
+            //dataSet[3].UserRatings.Add(105, 4.0);
+            DeviationTable table = new DeviationTable();
+            table.ComputeDeviations(dataSet);
+            //PrintDeviationTable(table);
 
-            // Dictionary<int, Dictionary<int, DeviationData>> deviationTable = GetDeviationTable(dataSet);
+            table.MultipleSlopeOne(dataSet[7].UserRatings, new List<int>(new int[] { 101, 103, 106 }));
+            Console.WriteLine("hello");
             Console.ReadLine();
 
 
@@ -91,52 +91,6 @@ namespace DataScience
             return current.Keys.Any(key => !target.ContainsKey(key)) || target.Values.Any(v => v==0);
         }
  
-        public static List<KeyValuePair<int, UserPreferance>> GetNearestNeighbours(
-            Dictionary<int, UserPreferance> users,
-            KeyValuePair<int, UserPreferance> target,
-            ISimiliartyCalculator similarityCalculator,
-            int maxNeighbours)
-        {
-
-            List<KeyValuePair<int, UserPreferance>> neighbours = new List<KeyValuePair<int, UserPreferance>>();
-            double similarityThreshold = 0.35;
-
-            foreach (KeyValuePair<int, UserPreferance> user in users)
-            {
-                if (user.Key != target.Key)
-                {
-                    double similarity = similarityCalculator.Calculate(user.Value.UserRatings, target.Value.UserRatings);
-                    bool hasExtra = DictionaryHasExtra(user.Value.UserRatings, target.Value.UserRatings);
-
-                    if (similarity > similarityThreshold && hasExtra)
-                    {
-                        if (neighbours.Count < maxNeighbours)
-                        {
-                            user.Value.similarity = similarity;
-                            neighbours.Add(user);
-                        }
-                        else
-                        {
-                            double minSimilarity = neighbours.Min(entry => entry.Value.similarity);
-                            if (similarity > minSimilarity)
-                            {
-                                KeyValuePair<int, UserPreferance> furthestNeighbour = neighbours.Find(entry => entry.Value.similarity == minSimilarity);
-                                neighbours.Remove(furthestNeighbour);
-                                user.Value.similarity = similarity;
-                                neighbours.Add(user);
-                            }
-                        }
-                    }
-
-                    if (neighbours.Count == maxNeighbours)
-                    {
-                        similarityThreshold = neighbours.Min(entry => entry.Value.similarity);
-                    }
-                }
-            }
-            return neighbours.OrderByDescending(x => x.Value.similarity).ToList();
-        }
-
         public static List<int> GetAllArticleIds(Dictionary<int, UserPreferance> users)
         {
             List<int> articleIds = new List<int>();
@@ -153,26 +107,9 @@ namespace DataScience
             return articleIds.OrderByDescending(x => x).ToList();
         }
 
-        public static DeviationData GetDeviationData(Dictionary<int, UserPreferance> users, int itemA, int itemB)
-        {
-            double currentDeviation = 0;
-            int count = 0;
-            foreach (KeyValuePair<int, UserPreferance> user in users)
-            {
-                Dictionary<int, double> ratings = user.Value.UserRatings;
-                if (ratings.ContainsKey(itemA) && ratings.ContainsKey(itemB))
-                {
-
-                    currentDeviation += ratings[itemA] - ratings[itemB];
-                    count++;
-                }
-            }
-            return new DeviationData(currentDeviation / count, count);
-        }
-
         public static void PrintDeviationTable(DeviationTable table)
         {
-            foreach (KeyValuePair<int,Dictionary<int,DeviationData>> itemA in table.table)
+            foreach (KeyValuePair<int,Dictionary<int,DeviationData>> itemA in table.data)
             {
                 Console.WriteLine("row: "+ itemA.Key);
                 foreach (KeyValuePair<int, DeviationData> itemB in itemA.Value)
@@ -181,10 +118,5 @@ namespace DataScience
                 }
             }
         }
-
-        //public static double ItemItemRatingCalculator(KeyValuePair<int, UserPreferance> user, int targetArticleId, Dictionary<int, Dictionary<int, DeviationData>> deviationtable)
-        //{
-
-        //}
     }
 }

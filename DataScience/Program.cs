@@ -24,7 +24,7 @@ namespace DataScience
             //Console.WriteLine(pearson.Calculate(testUser1, testUser2) + " pearson");
             //Console.WriteLine(cosine.Calculate(testUser1, testUser2) + " cosine");
 
-            Dictionary<int, UserPreferance> dataSet = ParseDataSet(@"D:\github\DataScience\userItem.data", ",");
+            //Dictionary<int, UserPreferance> dataSet = ParseDataSet(@"D:\github\DataScience\userItem.data", ",");
 
             //// neighbour and ratings
             //int testId = 7;
@@ -34,7 +34,7 @@ namespace DataScience
             //userItem.GetNearestNeighbours(testPair, pearson, 3);
             //List<KeyValuePair<int, double>> ratingPrediction = userItem.PredictGivenList(new List<int>(new int[] { 101, 103, 106 }));
 
-            //Dictionary<int, UserPreferance> dataSet = ParseDataSet(@"D:\github\DataScience\u.data", "\t");
+            Dictionary<int, UserPreferance> dataSet = ParseDataSet(@"D:\github\DataScience\u.data", "\t");
             //int testId = 186;
             //KeyValuePair<int, UserPreferance> testPair = new KeyValuePair<int, UserPreferance>(testId, dataSet[testId]);
             //UserItem userItem = new UserItem(dataSet);
@@ -44,9 +44,20 @@ namespace DataScience
             //dataSet[3].UserRatings.Add(105, 4.0);
             DeviationTable table = new DeviationTable();
             table.ComputeDeviations(dataSet);
+            var x = table.data[1];
+            var x2 = table.data[2];
+            var x3 = table.data[3];
+
+            var sorted = from entry in table.data.Keys orderby entry descending select entry;
+
+            var sortedX = from entry in x orderby entry.Key descending select entry;
+            var sortedX2 = from entry in x orderby entry.Key descending select entry;
+            var sortedX3 = from entry in x orderby entry.Key descending select entry;
+
+            List<KeyValuePair<int, double>> top5 = table.Top5SlopeOne(dataSet[186].UserRatings).GetRange(0, 5);
             //PrintDeviationTable(table);
 
-            table.MultipleSlopeOne(dataSet[7].UserRatings, new List<int>(new int[] { 101, 103, 106 }));
+            //table.MultipleSlopeOne(new List<int>(new int[] { 101, 103, 106 }), dataSet[7].UserRatings);
             Console.WriteLine("hello");
             Console.ReadLine();
 

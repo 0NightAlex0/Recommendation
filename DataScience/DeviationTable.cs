@@ -9,7 +9,7 @@ namespace DataScience
     {
         public Dictionary<int, Dictionary<int, DeviationData>> data = new Dictionary<int, Dictionary<int, DeviationData>>();
 
-        public void ComputeDeviations(Dictionary<int, UserPreferance> users)
+        public void ComputeDeviations8sec(Dictionary<int, UserPreferance> users)
         {
             int itemA;// x
             int itemB;// y
@@ -26,7 +26,7 @@ namespace DataScience
                     {
                         data.Add(itemA, new Dictionary<int, DeviationData>());
                     }
-                    // something is wrong with the second loop/ its not adding all B/ count A and count b not the same
+
                     foreach (KeyValuePair<int, double> rating2 in ratings)
                     {
                         itemB = rating2.Key;
@@ -44,16 +44,54 @@ namespace DataScience
                 }
             }
 
-            // maybe check if its nan and not infinity, then set it to 0
             foreach (KeyValuePair<int, Dictionary<int, DeviationData>> pair in data)
             {
                 foreach (KeyValuePair<int, DeviationData> cell in pair.Value)
                 {
                     DeviationData data = cell.Value;
-                    data.deviationValue = data.deviationValue / data.nrOfPeople;
+                    data.deviationValue /= data.nrOfPeople;
                 }
             }
         }
+
+        //public void ComputeDeviations(Dictionary<int, UserPreferance> users)
+        //{
+        //    List<int> articles =  Program.GetAllArticleIds(users);
+
+        //    foreach(int article in articles)
+        //    {
+        //        foreach(int article2 in articles)
+        //        {
+        //            // if smaller skip
+        //            if(article != article2 && article2 > article)
+        //            {
+        //                if (!data.ContainsKey(article))
+        //                {
+        //                    data.Add(article, new Dictionary<int, DeviationData>());
+        //                }
+        //                if (!data.ContainsKey(article2))
+        //                {
+        //                    data.Add(article2, new Dictionary<int, DeviationData>());
+        //                }
+        //                double sumDifference = 0.0;
+        //                int cardinality = 0;
+        //                foreach (KeyValuePair<int, UserPreferance> user in users)
+        //                {
+        //                    Dictionary<int, double> ratings = user.Value.UserRatings;
+        //                    if (ratings.ContainsKey(article) && ratings.ContainsKey(article2))
+        //                    {
+        //                        sumDifference += ratings[article] - ratings[article2];
+        //                        cardinality++;
+        //                    }
+
+        //                }
+        //                data[article].Add(article2, new DeviationData(sumDifference / cardinality, cardinality));
+        //                data[article2].Add(article, new DeviationData(-1 * (sumDifference / cardinality), cardinality));
+        //            }
+
+        //        }
+        //    }
+        //}
 
         public double SlopeOneRecommendations(int target, Dictionary<int, double> ratings)
         {
@@ -94,10 +132,28 @@ namespace DataScience
             
             return result.OrderByDescending(pair => pair.Value).ToList();
         }
-
-        public void UpdateTable(KeyValuePair<int, UserPreferance> user, int article, double articleRating)
+        // the 105 is wrong. the value is only halve of what it should be
+        public void Update(Dictionary<int, double> ratings, int article, double articleRating)
         {
+            // 2 for loop to loop through every ratings to get x and y
+            foreach (KeyValuePair<int, double> rating in ratings)
+            {
+                if (data.ContainsKey(article))
+                {
+                    if (data[article].ContainsKey(rating.Key))
+                    {
+                        DeviationData cell1 = data[article][rating.Key];
+                        cell1.deviationValue = (cell1.deviationValue * cell1.nrOfPeople) + articleRating - rating.Value;
+                        cell1.nrOfPeople++;
+                        cell1.deviationValue /= cell1.nrOfPeople;
 
+                        DeviationData cell2 = data[rating.Key][article];
+                        cell2.deviationValue = -1 * cell1.deviationValue;
+                        cell2.nrOfPeople = cell1.nrOfPeople;
+                    }
+                }
+            }
+            ratings.Add(article, articleRating);
         }
     }
-}
+} 

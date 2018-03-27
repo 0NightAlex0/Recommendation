@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace DataScience
 {
-
+    enum DataSetSize { Small, Big};
     class Program
     {
 
@@ -24,8 +24,12 @@ namespace DataScience
             //Console.WriteLine(pearson.Calculate(testUser1, testUser2) + " pearson");
             //Console.WriteLine(cosine.Calculate(testUser1, testUser2) + " cosine");
 
-            //Dictionary<int, UserPreferance> dataSet = ParseDataSet(@"D:\github\DataScience\userItem.data", ",");
-
+            // 1 =  user item small
+            // 2 = user item movielens
+            // 3 = item item small
+            // 4 = item item movielens
+            int run = 1;
+            Dictionary<int, UserPreferance> dataSet = GetDataSet(DataSetSize.Small);
             //// neighbour and ratings
             //int testId = 7;
             //dataSet[testId].UserRatings.Add(106, 5);
@@ -34,30 +38,24 @@ namespace DataScience
             //userItem.GetNearestNeighbours(testPair, pearson, 3);
             //List<KeyValuePair<int, double>> ratingPrediction = userItem.PredictGivenList(new List<int>(new int[] { 101, 103, 106 }));
 
-            Dictionary<int, UserPreferance> dataSet = ParseDataSet(@"D:\github\DataScience\u.data", "\t");
+
             //int testId = 186;
             //KeyValuePair<int, UserPreferance> testPair = new KeyValuePair<int, UserPreferance>(testId, dataSet[testId]);
             //UserItem userItem = new UserItem(dataSet);
             //userItem.GetNearestNeighbours(testPair, pearson, 25);
             //List<KeyValuePair<int, double>> ratingPrediction = userItem.PredictAll(testPair).GetRange(0, 8);
 
-            //dataSet[3].UserRatings.Add(105, 4.0);
             DeviationTable table = new DeviationTable();
-            table.ComputeDeviations(dataSet);
-            var x = table.data[1];
-            var x2 = table.data[2];
-            var x3 = table.data[3];
+            table.ComputeDeviations8sec(dataSet);
+            table.Update(dataSet[3].UserRatings, 105, 4.0);
 
-            var sorted = from entry in table.data.Keys orderby entry descending select entry;
+            //dataSet[3].UserRatings.Add(105, 4.0);
+            //table.ComputeDeviations8sec(dataSet);
+            PrintDeviationTable(table);
+            table.MultipleSlopeOne(new List<int>(new int[] { 101, 103, 106 }), dataSet[7].UserRatings);
 
-            var sortedX = from entry in x orderby entry.Key descending select entry;
-            var sortedX2 = from entry in x orderby entry.Key descending select entry;
-            var sortedX3 = from entry in x orderby entry.Key descending select entry;
+            //List<KeyValuePair<int, double>> top5 = table.Top5SlopeOne(dataSet[186].UserRatings).GetRange(0, 5);
 
-            List<KeyValuePair<int, double>> top5 = table.Top5SlopeOne(dataSet[186].UserRatings).GetRange(0, 5);
-            //PrintDeviationTable(table);
-
-            //table.MultipleSlopeOne(new List<int>(new int[] { 101, 103, 106 }), dataSet[7].UserRatings);
             Console.WriteLine("hello");
             Console.ReadLine();
 
@@ -84,7 +82,22 @@ namespace DataScience
             }
             return dataSet;
         }
-
+        public static Dictionary<int, UserPreferance> GetDataSet(DataSetSize size)
+        {
+            if (size == DataSetSize.Small)
+            {
+                return ParseDataSet(@"D:\github\DataScience\userItem.data", ",");
+            }
+            else if (size == DataSetSize.Big)
+            {
+                return ParseDataSet(@"D:\github\DataScience\u.data", "\t");
+            }
+            else
+            {
+                throw new Exception("Size not found");
+            }
+            
+        }
         public static void PrintDataSet(Dictionary<int, UserPreferance> dataSet)
         {
             foreach (KeyValuePair<int, UserPreferance> user in dataSet)
@@ -115,7 +128,7 @@ namespace DataScience
                     }
                 }
             }
-            return articleIds.OrderByDescending(x => x).ToList();
+            return articleIds.OrderBy(x => x).ToList();
         }
 
         public static void PrintDeviationTable(DeviationTable table)

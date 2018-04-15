@@ -5,13 +5,17 @@ using System.Linq;
 
 namespace DataScience
 {
+    public class Pair<T1, T2>
+    {
+        public T1 First { get; set; }
+        public T2 Second { get; set; }
+    }
     enum DataSetSize { Small, Big};
     class Program
     {
 
         static void Main(string[] args)
         {
-
 
             ISimiliartyCalculator euclidean = new Euclidean();
             ISimiliartyCalculator pearson = new Pearson();
@@ -24,19 +28,14 @@ namespace DataScience
             //Console.WriteLine(pearson.Calculate(testUser1, testUser2) + " pearson");
             //Console.WriteLine(cosine.Calculate(testUser1, testUser2) + " cosine");
 
-            // 1 =  user item small
-            // 2 = user item movielens
-            // 3 = item item small
-            // 4 = item item movielens
-            int run = 1;
             Dictionary<int, UserPreferance> dataSet = GetDataSet(DataSetSize.Small);
             //// neighbour and ratings
-            //int testId = 7;
+            int testId = 7;
             //dataSet[testId].UserRatings.Add(106, 5);
-            //KeyValuePair<int, UserPreferance> testPair = new KeyValuePair<int, UserPreferance>(testId, dataSet[testId]);
-            //UserItem userItem = new UserItem(dataSet);
-            //userItem.GetNearestNeighbours(testPair, pearson, 3);
-            //List<KeyValuePair<int, double>> ratingPrediction = userItem.PredictGivenList(new List<int>(new int[] { 101, 103, 106 }));
+            KeyValuePair<int, UserPreferance> testPair = new KeyValuePair<int, UserPreferance>(testId, dataSet[testId]);
+            UserItem userItem = new UserItem(dataSet);
+            userItem.GetNearestNeighbours(testPair, cosine, 3);
+            List<KeyValuePair<int, double>> ratingPrediction = userItem.PredictGivenList(new List<int>(new int[] { 101, 103, 106 }));
 
 
             //int testId = 186;
@@ -45,14 +44,14 @@ namespace DataScience
             //userItem.GetNearestNeighbours(testPair, pearson, 25);
             //List<KeyValuePair<int, double>> ratingPrediction = userItem.PredictAll(testPair).GetRange(0, 8);
 
-            DeviationTable table = new DeviationTable();
-            table.ComputeDeviations8sec(dataSet);
-            table.Update(dataSet[3].UserRatings, 105, 4.0);
+            //DeviationTable table = new DeviationTable();
+            //table.ComputeDeviations8sec(dataSet);
+            //table.Update(dataSet[3].UserRatings, 105, 4.0);
 
             //dataSet[3].UserRatings.Add(105, 4.0);
             //table.ComputeDeviations8sec(dataSet);
-            PrintDeviationTable(table);
-            table.MultipleSlopeOne(new List<int>(new int[] { 101, 103, 106 }), dataSet[7].UserRatings);
+            //PrintDeviationTable(table);
+            //table.MultipleSlopeOne(new List<int>(new int[] { 101, 103, 106 }), dataSet[7].UserRatings);
 
             //List<KeyValuePair<int, double>> top5 = table.Top5SlopeOne(dataSet[186].UserRatings).GetRange(0, 5);
 
@@ -62,7 +61,6 @@ namespace DataScience
 
         }
 
-        // tab seperated
         public static Dictionary<int, UserPreferance> ParseDataSet(string path, string seperator)
         {
             string[] lines = File.ReadAllLines(path);
@@ -112,7 +110,9 @@ namespace DataScience
 
         public static bool DictionaryHasExtra(Dictionary<int, double> current, Dictionary<int, double> target)
         {
-            return current.Keys.Any(key => !target.ContainsKey(key)) || target.Values.Any(v => v==0);
+            // current has a key that target does not have.
+            // since cosine fills in everything empty with 0, it will think it doesnt have any extra keys.
+            return current.Keys.Any(key => !target.ContainsKey(key) || target[key] == 0);
         }
  
         public static List<int> GetAllArticleIds(Dictionary<int, UserPreferance> users)

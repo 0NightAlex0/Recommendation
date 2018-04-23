@@ -29,10 +29,10 @@ namespace DataScience
                     sumYY += y * y;
                 }
             }
-            double upperResult = sumXY - (sumX * sumY) / counter;
-            double lowerResult = Math.Sqrt(sumXX - Math.Pow(sumX, 2) / counter) * Math.Sqrt(sumYY - Math.Pow(sumY, 2) / counter);
+            double nominator = sumXY - (sumX * sumY) / counter;
+            double denominator = Math.Sqrt(sumXX - Math.Pow(sumX, 2) / counter) * Math.Sqrt(sumYY - Math.Pow(sumY, 2) / counter);
 
-            return upperResult / lowerResult;
+            return nominator / denominator;
         }
     }
 }

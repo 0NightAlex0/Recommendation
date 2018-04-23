@@ -12,25 +12,26 @@ namespace DataScience
             this.users = dataset;
         }
 
-        private double CalculateRating(List<KeyValuePair<int, UserPreferance>> neighbours, int articleId)
+        private double CalculateRating(int articleId)
         {
             double weightedRating = 0;
             double sumSimilarties = 0;
             foreach (KeyValuePair<int, UserPreferance> neighbour in neighbours)
             {
-                UserPreferance user = neighbour.Value;
-                Dictionary<int, double> ratings = user.UserRatings;
+                UserPreferance userPreferance = neighbour.Value;
+                Dictionary<int, double> ratings = userPreferance.UserRatings;
                 if (ratings.ContainsKey(articleId))
                 {
-                    double similarity = user.similarity;
+                    double similarity = userPreferance.similarity;
                     weightedRating += ratings[articleId] * similarity;
                     sumSimilarties += similarity;
                 }
             }
             return weightedRating / sumSimilarties;
         }
+
         // if >3 neighbours rated, then calculate rating
-        public void GetNearestNeighbours(
+        public void ComputeNearestNeighbours(
            KeyValuePair<int, UserPreferance> target,
            ISimiliartyCalculator similarityCalculator,
            int maxNeighbours)
@@ -101,14 +102,14 @@ namespace DataScience
                     if (count >= 3)
                     {
                         // add to predictionList
-                        double rating = CalculateRating(neighbours, key);
+                        double rating = CalculateRating(key);
                         ratingPredictions.Add(new KeyValuePair<int, double>(key, rating));
                         break;
                     }
 
                 }
             }
-            
+
             return ratingPredictions.OrderByDescending(pair => pair.Value).ToList();
         }
 
@@ -117,7 +118,7 @@ namespace DataScience
             List<KeyValuePair<int, double>> ratingPredictions = new List<KeyValuePair<int, double>>();
             foreach (int articleId in articleIds)
             {
-                double rating = CalculateRating(neighbours, articleId);
+                double rating = CalculateRating(articleId);
                 ratingPredictions.Add(new KeyValuePair<int, double>(articleId, rating));
 
             }

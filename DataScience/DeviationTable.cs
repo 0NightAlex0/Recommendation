@@ -43,9 +43,10 @@ namespace DataScience
                     }
                 }
             }
-
+            // for each row
             foreach (KeyValuePair<int, Dictionary<int, DeviationData>> pair in data)
             {
+                //for each column
                 foreach (KeyValuePair<int, DeviationData> cell in pair.Value)
                 {
                     DeviationData data = cell.Value;
@@ -54,51 +55,54 @@ namespace DataScience
             }
         }
 
-        //public void ComputeDeviations(Dictionary<int, UserPreferance> users)
-        //{
-        //    List<int> articles =  Program.GetAllArticleIds(users);
+        public void ComputeDeviations(Dictionary<int, UserPreferance> users)
+        {
+            //all articles
+            List<int> articles = Program.GetAllArticleIds(users);
+            //Loop through each pair
+            foreach (int article in articles)
+            {
+                foreach (int article2 in articles)
+                {
+                    // if smaller skip
+                    if (article != article2 && article2 > article)
+                    {
+                        if (!data.ContainsKey(article))
+                        {
+                            data.Add(article, new Dictionary<int, DeviationData>());
+                        }
+                        if (!data.ContainsKey(article2))
+                        {
+                            data.Add(article2, new Dictionary<int, DeviationData>());
+                        }
+                        double sumDifference = 0.0;
+                        int cardinality = 0;
+                        foreach (KeyValuePair<int, UserPreferance> user in users)
+                        {
+                            Dictionary<int, double> ratings = user.Value.UserRatings;
+                            if (ratings.ContainsKey(article) && ratings.ContainsKey(article2))
+                            {
+                                sumDifference += ratings[article] - ratings[article2];
+                                cardinality++;
+                            }
 
-        //    foreach(int article in articles)
-        //    {
-        //        foreach(int article2 in articles)
-        //        {
-        //            // if smaller skip
-        //            if(article != article2 && article2 > article)
-        //            {
-        //                if (!data.ContainsKey(article))
-        //                {
-        //                    data.Add(article, new Dictionary<int, DeviationData>());
-        //                }
-        //                if (!data.ContainsKey(article2))
-        //                {
-        //                    data.Add(article2, new Dictionary<int, DeviationData>());
-        //                }
-        //                double sumDifference = 0.0;
-        //                int cardinality = 0;
-        //                foreach (KeyValuePair<int, UserPreferance> user in users)
-        //                {
-        //                    Dictionary<int, double> ratings = user.Value.UserRatings;
-        //                    if (ratings.ContainsKey(article) && ratings.ContainsKey(article2))
-        //                    {
-        //                        sumDifference += ratings[article] - ratings[article2];
-        //                        cardinality++;
-        //                    }
+                        }
+                        data[article].Add(article2, new DeviationData(sumDifference / cardinality, cardinality));
+                        data[article2].Add(article, new DeviationData(-1 * (sumDifference / cardinality), cardinality));
+                    }
 
-        //                }
-        //                data[article].Add(article2, new DeviationData(sumDifference / cardinality, cardinality));
-        //                data[article2].Add(article, new DeviationData(-1 * (sumDifference / cardinality), cardinality));
-        //            }
-
-        //        }
-        //    }
-        //}
+                }
+            }
+        }
 
         public double SlopeOneRecommendations(int target, Dictionary<int, double> ratings)
         {
             double numerator = 0.0;
             int denominator = 0;
+            // for each item that user alrdy rated
             foreach (KeyValuePair<int, double> rating in ratings)
             {
+                // extract info about the dev between i(item rated by user) and the j 
                 if (data[target].ContainsKey(rating.Key))
                 {
                     DeviationData deviationCell = data[target][rating.Key];
@@ -132,14 +136,16 @@ namespace DataScience
             
             return result.OrderByDescending(pair => pair.Value).ToList();
         }
-        // the 105 is wrong. the value is only halve of what it should be
+
         public void Update(Dictionary<int, double> ratings, int article, double articleRating)
         {
-            // 2 for loop to loop through every ratings to get x and y
+            // update all articles connected to the ratings of the current user
             foreach (KeyValuePair<int, double> rating in ratings)
             {
+                // x
                 if (data.ContainsKey(article))
                 {
+                    // y
                     if (data[article].ContainsKey(rating.Key))
                     {
                         DeviationData cell1 = data[article][rating.Key];

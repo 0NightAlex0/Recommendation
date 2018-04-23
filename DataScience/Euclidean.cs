@@ -4,9 +4,9 @@ using System.Text;
 
 namespace DataScience
 {
-    class Euclidean : ISimiliartyCalculator
+    class Euclidean : DistanceCalculatorClass
     {
-        public double Calculate(Dictionary<int, double> ratings1, Dictionary<int, double> ratings2)
+        public override double Calculate(Dictionary<int, double> ratings1, Dictionary<int, double> ratings2)
         {
             double sumRating = 0;
             foreach (KeyValuePair<int, double> pair1 in ratings1)
@@ -18,12 +18,6 @@ namespace DataScience
             }
             double distance = Math.Sqrt(sumRating);
             return Similarity(distance);
-        }
-
-        // for euclidian and manhatten
-        static double Similarity(double distance)
-        {
-            return 1 / (1 + distance);
         }
     }
 }

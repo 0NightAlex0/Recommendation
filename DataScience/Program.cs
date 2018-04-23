@@ -16,32 +16,31 @@ namespace DataScience
 
         static void Main(string[] args)
         {
-
             ISimiliartyCalculator euclidean = new Euclidean();
             ISimiliartyCalculator pearson = new Pearson();
             ISimiliartyCalculator cosine = new Cosine();
-
+            Dictionary<int, UserPreferance> dataSet = GetDataSet(DataSetSize.Small);
             // similarity
-            //Dictionary<int, double> testUser1 = dataSet[7].UserRatings;
-            //Dictionary<int, double> testUser2 = dataSet[4].UserRatings;
-            //Console.WriteLine(euclidean.Calculate(testUser1, testUser2) + " euclidean");
+            Dictionary<int, double> testUser1 = dataSet[7].UserRatings;
+            Dictionary<int, double> testUser2 = dataSet[4].UserRatings;
+            Console.WriteLine(euclidean.Calculate(testUser1, testUser2) + " euclidean");
             //Console.WriteLine(pearson.Calculate(testUser1, testUser2) + " pearson");
             //Console.WriteLine(cosine.Calculate(testUser1, testUser2) + " cosine");
 
-            Dictionary<int, UserPreferance> dataSet = GetDataSet(DataSetSize.Small);
+            
             //// neighbour and ratings
             int testId = 7;
             //dataSet[testId].UserRatings.Add(106, 5);
             KeyValuePair<int, UserPreferance> testPair = new KeyValuePair<int, UserPreferance>(testId, dataSet[testId]);
             UserItem userItem = new UserItem(dataSet);
-            userItem.GetNearestNeighbours(testPair, cosine, 3);
+            userItem.ComputeNearestNeighbours(testPair, pearson, 3);
             List<KeyValuePair<int, double>> ratingPrediction = userItem.PredictGivenList(new List<int>(new int[] { 101, 103, 106 }));
 
 
             //int testId = 186;
             //KeyValuePair<int, UserPreferance> testPair = new KeyValuePair<int, UserPreferance>(testId, dataSet[testId]);
             //UserItem userItem = new UserItem(dataSet);
-            //userItem.GetNearestNeighbours(testPair, pearson, 25);
+            //userItem.ComputeNearestNeighbours(testPair, pearson, 25);
             //List<KeyValuePair<int, double>> ratingPrediction = userItem.PredictAll(testPair).GetRange(0, 8);
 
             //DeviationTable table = new DeviationTable();
@@ -113,6 +112,7 @@ namespace DataScience
             // current has a key that target does not have.
             // since cosine fills in everything empty with 0, it will think it doesnt have any extra keys.
             return current.Keys.Any(key => !target.ContainsKey(key) || target[key] == 0);
+
         }
  
         public static List<int> GetAllArticleIds(Dictionary<int, UserPreferance> users)
